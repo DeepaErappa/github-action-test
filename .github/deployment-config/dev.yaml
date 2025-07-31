@@ -1,0 +1,7 @@
+properties:
+  build_and_test:
+    backend_url:
+      - https://www.dev.google.com
+      - test:
+          requires:
+            - build

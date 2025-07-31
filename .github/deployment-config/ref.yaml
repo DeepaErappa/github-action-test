@@ -1,0 +1,7 @@
+properties:
+  build_and_test:
+    backend_url:
+      - https://www.ref.google.com
+      - test:
+          requires:
+            - build
