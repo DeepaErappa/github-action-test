@@ -1,0 +1,28 @@
+name: Auto Update API YAML on Merge
+
+on:
+  pull_request:
+    types: [closed]  # Triggers when PR is closed (merged or not)
+
+jobs:
+  update-api-yaml:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Run main.py with source and target branches
+        run: |
+          echo "Source: ${{ github.event.pull_request.head.ref }}"
+          echo "Target: ${{ github.event.pull_request.base.ref }}"
+          python3 main.py "${{ github.event.pull_request.head.ref }}" "${{ github.event.pull_request.base.ref }}"
