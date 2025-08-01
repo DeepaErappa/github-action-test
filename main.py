@@ -9,9 +9,9 @@ CONFIG_DIR = "deployment-config"
 # Define merge paths and their corresponding config files
 MERGE_MAP = {
     ("dev", "reference"): "ref.yaml",
-    ("reference", "staging"): "staging.yaml",
-    ("staging", "main"): "prod.yaml",
-    ("staging", "master"): "prod.yaml"
+    ("reference", "staging"): {"type": "external", "repo": "https://github.com/DeepaErappa/git-config-files.git", "file": "deployment-config/staging.yaml"},
+    ("staging", "main"): {"type": "external", "repo": "https://github.com/DeepaErappa/git-config-files.git", "file": "deployment-config/prod.yaml"},
+    ("staging", "master"): {"type": "external", "repo": "https://github.com/DeepaErappa/git-config-files.git", "file": "deployment-config/prod.yaml"},
 }
 
 def get_current_branch():
