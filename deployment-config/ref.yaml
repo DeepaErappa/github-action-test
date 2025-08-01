@@ -1,4 +1,4 @@
-version: 1.0
+version: 1.0.01
 properties:
   v1validatetoken:
     value: /sgwtv/v1/validate/token
