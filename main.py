@@ -2,7 +2,7 @@ import os
 import subprocess
 import yaml
 
-# File paths for testing
+# File paths 
 API_YAML = ".github/api-definitions/api.yaml"
 CONFIG_DIR = ".github/deployment-config"
 
