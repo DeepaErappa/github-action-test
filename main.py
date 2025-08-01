@@ -2,9 +2,7 @@ import os
 import subprocess
 import sys
 import yaml
-import tempfile
-import shutil
-from pathlib import Path
+import requests
 
 # File paths
 API_YAML = "api-definitions/api.yaml"
@@ -15,18 +13,21 @@ MERGE_MAP = {
     ("dev", "reference"): "ref.yaml",
     ("reference", "staging"): {
         "type": "external",
-        "repo": "https://github.com/DeepaErappa/git-config-files.git",
-        "file": "deployment-config/staging.yaml"
+        "repo": "DeepaErappa/git-config-files",
+        "file": "deployment-config/staging.yaml",
+        "branch": "main"  # You can change this to the actual branch
     },
     ("staging", "main"): {
         "type": "external",
-        "repo": "https://github.com/DeepaErappa/git-config-files.git",
-        "file": "deployment-config/prod.yaml"
+        "repo": "DeepaErappa/git-config-files",
+        "file": "deployment-config/prod.yaml",
+        "branch": "main"
     },
     ("staging", "master"): {
         "type": "external",
-        "repo": "https://github.com/DeepaErappa/git-config-files.git",
-        "file": "deployment-config/prod.yaml"
+        "repo": "DeepaErappa/git-config-files",
+        "file": "deployment-config/prod.yaml",
+        "branch": "main"
     },
 }
 
@@ -49,35 +50,38 @@ def write_yaml(path, data):
     with open(path, 'w') as file:
         yaml.dump(data, file, sort_keys=False)
 
-def replace_properties(env_yaml_file):
-    print(f"[•] Using local config file: {env_yaml_file}")
-    env_path = os.path.join(CONFIG_DIR, env_yaml_file)
-    update_properties(API_YAML, env_path)
+def fetch_external_yaml(repo, path, branch):
+    token = os.getenv("GH_TOKEN")
+    if not token:
+        raise EnvironmentError("GH_TOKEN not set in environment")
 
-def fetch_external_yaml(repo_url, target_file):
-    print(f"[•] Cloning repo: {repo_url}")
-    temp_dir = tempfile.mkdtemp()
-    try:
-        subprocess.run(['git', 'clone', '--depth=1', repo_url, temp_dir], check=True)
-        file_path = os.path.join(temp_dir, target_file)
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"{target_file} not found in {repo_url}")
-        return file_path
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Failed to clone repository: {e}")
-    finally:
-        shutil.rmtree(temp_dir)
+    url = f"https://api.github.com/repos/{repo}/contents/{path}?ref={branch}"
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3.raw"
+    }
 
-def update_properties(api_yaml_path, env_yaml_path):
+    print(f"[•] Fetching file from GitHub API: {url}")
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        raise RuntimeError(f"Failed to fetch file: {response.status_code} - {response.text}")
+
+    return yaml.safe_load(response.text)
+
+def update_properties_from_dict(api_yaml_path, env_data):
     api_data = load_yaml(api_yaml_path)
-    env_data = load_yaml(env_yaml_path)
 
     if 'properties' not in env_data:
-        raise KeyError(f"'properties' section not found in {env_yaml_path}")
+        raise KeyError("'properties' section not found in fetched config")
 
     api_data['properties'] = env_data['properties']
     write_yaml(api_yaml_path, api_data)
-    print(f"[✓] Updated '{api_yaml_path}' using properties from '{env_yaml_path}'")
+    print(f"[✓] Updated '{api_yaml_path}' using properties from fetched config")
+
+def replace_properties(env_yaml_file):
+    print(f"[•] Using local config file: {env_yaml_file}")
+    env_path = os.path.join(CONFIG_DIR, env_yaml_file)
+    update_properties_from_dict(API_YAML, load_yaml(env_path))
 
 def main():
     if len(sys.argv) == 3:
@@ -98,11 +102,9 @@ def main():
     if isinstance(config, str):
         replace_properties(config)
     elif isinstance(config, dict) and config.get("type") == "external":
-        repo_url = config["repo"]
-        remote_file = config["file"]
         try:
-            external_yaml_path = fetch_external_yaml(repo_url, remote_file)
-            update_properties(API_YAML, external_yaml_path)
+            env_data = fetch_external_yaml(config["repo"], config["file"], config.get("branch", "main"))
+            update_properties_from_dict(API_YAML, env_data)
         except Exception as e:
             print(f"[✗] Error: {e}")
     else:
