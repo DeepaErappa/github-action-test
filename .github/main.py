@@ -69,6 +69,7 @@ def replace_properties(env_yaml_file):
     if env_yaml_file in ["staging.yaml", "prod.yaml"]:
         print(f"[i] Fetching {env_yaml_file} from external repository")
         env_data = fetch_external_yaml_file(EXTERNAL_REPO, f"deployment-config/{env_yaml_file}", EXTERNAL_BRANCH)
+        print(env_data)
     else:
         env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
 
