@@ -3,8 +3,8 @@ import subprocess
 import yaml
 
 # File paths
-API_YAML = "api-definitions/api.yaml"
-CONFIG_DIR = "deployment-config"
+API_YAML = ".github/api-definitions/api.yaml"
+CONFIG_DIR = ".github/deployment-config"
 
 # Define merge paths and their corresponding config files
 MERGE_MAP = {
@@ -45,21 +45,29 @@ def replace_properties(env_yaml_file):
     write_yaml(API_YAML, api_data)
     print(f"[✓] Updated 'properties' in {API_YAML} using {env_yaml_file}")
 
-# main.py
+
+
+# def main():
+#     current_branch = get_current_branch()
+#     source_branch = get_last_merged_branch()
+
+#     print(f"Detected merge from: {source_branch} → {current_branch}")
+
+#     key = (source_branch, current_branch)
+#     if key in MERGE_MAP:
+#         replace_properties(MERGE_MAP[key])
+#     else:
+#         print(f"No config found for {source_branch} → {current_branch}. Skipping replacement.")
 
 import sys
-from your_module import merge_and_replace_yaml  # Assuming you've modularized logic
-
-source_branch = sys.argv[1]
-target_branch = sys.argv[2]
-
-# Call your merge simulation logic
-merge_and_replace_yaml(source_branch, target_branch)
-
 
 def main():
-    current_branch = get_current_branch()
-    source_branch = get_last_merged_branch()
+    if len(sys.argv) == 3:
+        source_branch = sys.argv[1]
+        current_branch = sys.argv[2]
+    else:
+        current_branch = get_current_branch()
+        source_branch = get_last_merged_branch()
 
     print(f"Detected merge from: {source_branch} → {current_branch}")
 
@@ -68,6 +76,7 @@ def main():
         replace_properties(MERGE_MAP[key])
     else:
         print(f"No config found for {source_branch} → {current_branch}. Skipping replacement.")
+
 
 if __name__ == "__main__":
     main()
