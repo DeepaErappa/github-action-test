@@ -11,6 +11,8 @@ REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 # Absolute paths to API and config directories
 API_YAML = os.path.join(REPO_ROOT, "api-definitions", "api.yaml")
 CONFIG_DIR = os.path.join(REPO_ROOT, "deployment-config")
+GITHUB_TOKEN = os.getenv("GH_TOKEN")
+
 # Define merge paths and their corresponding config files
 MERGE_MAP = {
     ("dev", "reference"): "ref.yaml",
