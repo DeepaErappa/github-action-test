@@ -1,48 +1,28 @@
-name: Append Print Statement on Merge from THBS-101 to reference
+name: Auto Update API YAML on Merge
 
 on:
   pull_request:
-    types: [closed]
-    branches:
-      - reference
-
-env:
-  TARGET_FILE: main.py  # Change this filename if needed
+    types: [closed]  # Triggers when PR is closed (merged or not)
 
 jobs:
-  append-print-statement:
-    if: |
-      github.event.pull_request.merged == true &&
-      github.event.pull_request.head.ref == 'THBS-101' &&
-      github.event.pull_request.base.ref == 'reference'
+  update-api-yaml:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check if target file exists and append print statement
-        run: |
-          echo "Looking for file: $TARGET_FILE"
-          if [ -f "$TARGET_FILE" ]; then
-            if ! grep -Fxq 'print("This is reference branch")' "$TARGET_FILE"; then
-              echo 'print("This is reference branch")' >> "$TARGET_FILE"
-              echo "Print statement appended to $TARGET_FILE"
-              echo "CHANGED=true" >> $GITHUB_ENV
-            else
-              echo "Print statement already present in $TARGET_FILE"
-              echo "CHANGED=false" >> $GITHUB_ENV
-            fi
-          else
-            echo "File $TARGET_FILE does not exist."
-            echo "CHANGED=false" >> $GITHUB_ENV
-          fi
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-      - name: Commit and push changes
-        if: env.CHANGED == 'true'
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Run main.py with source and target branches
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add "$TARGET_FILE"
-          git commit -m "Append print statement to $TARGET_FILE (merged from THBS-101 to reference)"
-          git push
+          echo "Source: ${{ github.event.pull_request.head.ref }}"
+          echo "Target: ${{ github.event.pull_request.base.ref }}"
+          python3 main.py "${{ github.event.pull_request.head.ref }}" "${{ github.event.pull_request.base.ref }}"
