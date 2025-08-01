@@ -1,4 +1,4 @@
-version: 2.1
+version: 1.0.10
 orbs:
   node: circleci/node@3.0.0
 jobs:
@@ -56,7 +56,7 @@ properties:
     description: /sgwtv/v1/validate/token
     encoded: false
   Experian-URL:
-    value: https://www.google.com
+    value: https://www.google.ref.com
     description: https://www.ref.google.com
   CDO-URL:
     value: https://www.chatgpt.com
