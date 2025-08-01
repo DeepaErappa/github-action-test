@@ -3,8 +3,8 @@ import subprocess
 import yaml
 
 # File paths 
-API_YAML = ".github/api-definitions/api.yaml"
-CONFIG_DIR = ".github/deployment-config"
+API_YAML = "api-definitions/api.yaml"
+CONFIG_DIR = "deployment-config"
 
 # Define merge paths and their corresponding config files
 MERGE_MAP = {

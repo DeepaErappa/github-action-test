@@ -53,7 +53,7 @@ jobs:
 properties:
   build_and_test:
     backend_url:
-    - https://www.dev.google.com
+    - https://www.ref.google.com
     - test:
         requires:
         - build
