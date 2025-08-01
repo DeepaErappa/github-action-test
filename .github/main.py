@@ -4,7 +4,6 @@ import yaml
 import requests
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
 # Go one level up to reach repo root
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 
