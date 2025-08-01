@@ -59,13 +59,13 @@ properties:
     value: https://www.pramitha.google.com
     description: https://www.dev.google.com
   CDO-URL:
-    value: https://www.dev.chatgpt.com
+    value: https://www.ref.chatgpt.com
   dapi-appid:
-    value: abcd
-    description: abcd
+    value: efgh
+    description: efgh
   dapi-clientsecret:
-    value: abcd
-    description: abcd
+    value: efgh
+    description: efgh
   dapi-channelid:
     value: WEB
     description: WEB
