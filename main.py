@@ -6,7 +6,7 @@ import tempfile
 import shutil
 from pathlib import Path
 
-# File paths
+# File paths dev 
 API_YAML = "api-definitions/api.yaml"
 CONFIG_DIR = "deployment-config"
 
