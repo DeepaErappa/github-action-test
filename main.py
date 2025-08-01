@@ -2,7 +2,7 @@ import os
 import subprocess
 import yaml
 
-# File paths 
+# File paths /
 API_YAML = "api-definitions/api.yaml"
 CONFIG_DIR = "deployment-config"
 
