@@ -1,39 +1,24 @@
 import os
 import subprocess
-import sys
 import yaml
-import tempfile
-import shutil
-from pathlib import Path
 
-# File paths dev 
+# File paths 
 API_YAML = "api-definitions/api.yaml"
 CONFIG_DIR = "deployment-config"
 
 # Define merge paths and their corresponding config files
 MERGE_MAP = {
     ("dev", "reference"): "ref.yaml",
-    ("reference", "staging"): {
-        "type": "external",
-        "repo": "https://github.com/DeepaErappa/git-config-files.git",
-        "file": "deployment-config/staging.yaml"
-    },
-    ("staging", "main"): {
-        "type": "external",
-        "repo": "https://github.com/DeepaErappa/git-config-files.git",
-        "file": "deployment-config/prod.yaml"
-    },
-    ("staging", "master"): {
-        "type": "external",
-        "repo": "https://github.com/DeepaErappa/git-config-files.git",
-        "file": "deployment-config/prod.yaml"
-    },
+    ("reference", "staging"): "staging.yaml",
+    ("staging", "main"): "prod.yaml",
+    ("staging", "master"): "prod.yaml"
 }
 
 def get_current_branch():
     return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode().strip()
 
 def get_last_merged_branch():
+    # Uses git log to parse last merged commit message
     log = subprocess.check_output(['git', 'log', '-1', '--pretty=%B']).decode().strip()
     if 'from' in log and 'into' in log:
         parts = log.split()
@@ -50,34 +35,38 @@ def write_yaml(path, data):
         yaml.dump(data, file, sort_keys=False)
 
 def replace_properties(env_yaml_file):
-    print(f"[•] Using local config file: {env_yaml_file}")
-    env_path = os.path.join(CONFIG_DIR, env_yaml_file)
-    update_properties(API_YAML, env_path)
-
-def fetch_external_yaml(repo_url, target_file):
-    print(f"[•] Cloning repo: {repo_url}")
-    temp_dir = tempfile.mkdtemp()
-    try:
-        subprocess.run(['git', 'clone', '--depth=1', repo_url, temp_dir], check=True)
-        file_path = os.path.join(temp_dir, target_file)
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"{target_file} not found in {repo_url}")
-        return file_path
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Failed to clone repository: {e}")
-    finally:
-        shutil.rmtree(temp_dir)
-
-def update_properties(api_yaml_path, env_yaml_path):
-    api_data = load_yaml(api_yaml_path)
-    env_data = load_yaml(env_yaml_path)
+    api_data = load_yaml(API_YAML)
+    env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
 
     if 'properties' not in env_data:
-        raise KeyError(f"'properties' section not found in {env_yaml_path}")
+        raise KeyError(f"'properties' not found in {env_yaml_file}")
+    # Update version if present
+    if 'version' in env_data:
+        api_data['version'] = env_data['version']
+        print(f"[✓] Updated 'version' in {API_YAML} to {env_data['version']}")
+    else:
+        print(f"[i] 'version' not found in {env_yaml_file}, skipping version update.")
+
 
     api_data['properties'] = env_data['properties']
-    write_yaml(api_yaml_path, api_data)
-    print(f"[✓] Updated '{api_yaml_path}' using properties from '{env_yaml_path}'")
+    write_yaml(API_YAML, api_data)
+    print(f"[✓] Updated 'properties' in {API_YAML} using {env_yaml_file}")
+
+
+
+# def main():
+#     current_branch = get_current_branch()
+#     source_branch = get_last_merged_branch()
+
+#     print(f"Detected merge from: {source_branch} → {current_branch}")
+
+#     key = (source_branch, current_branch)
+#     if key in MERGE_MAP:
+#         replace_properties(MERGE_MAP[key])
+#     else:
+#         print(f"No config found for {source_branch} → {current_branch}. Skipping replacement.")
+
+import sys
 
 def main():
     if len(sys.argv) == 3:
@@ -90,23 +79,11 @@ def main():
     print(f"Detected merge from: {source_branch} → {current_branch}")
 
     key = (source_branch, current_branch)
-    if key not in MERGE_MAP:
-        print(f"[!] No config found for merge path: {key}. Skipping update.")
-        return
-
-    config = MERGE_MAP[key]
-    if isinstance(config, str):
-        replace_properties(config)
-    elif isinstance(config, dict) and config.get("type") == "external":
-        repo_url = config["repo"]
-        remote_file = config["file"]
-        try:
-            external_yaml_path = fetch_external_yaml(repo_url, remote_file)
-            update_properties(API_YAML, external_yaml_path)
-        except Exception as e:
-            print(f"[✗] Error: {e}")
+    if key in MERGE_MAP:
+        replace_properties(MERGE_MAP[key])
     else:
-        print(f"[!] Unknown config format for {key}: {config}")
+        print(f"No config found for {source_branch} → {current_branch}. Skipping replacement.")
+
 
 if __name__ == "__main__":
     main()
