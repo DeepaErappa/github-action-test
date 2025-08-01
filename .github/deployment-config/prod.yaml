@@ -1,7 +1,0 @@
-properties:
-  build_and_test:
-    backend_url:
-      - https://www.google.com
-      - test:
-          requires:
-            - build
