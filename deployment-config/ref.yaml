@@ -1,16 +1,16 @@
-version: 1.0.10
+version: 1.0
 properties:
   v1validatetoken:
     value: /sgwtv/v1/validate/token
     description: /sgwtv/v1/validate/token
     encoded: false
   Experian-URL:
-    value: https://www.google.ref.com
+    value: https://www.ref.google.com
     description: https://www.ref.google.com
   CDO-URL:
     value: https://www.chatgpt.com
   dapi-appid:
-    value: abcd
+    value: efgh
     description: efgh
   dapi-clientsecret:
     value: efgh
