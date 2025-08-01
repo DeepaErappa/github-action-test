@@ -1,0 +1,74 @@
+version: 1.0.01
+orbs:
+  node: circleci/node@3.0.0
+jobs:
+  build:
+    working_directory: ~/mern-starter
+    executor: node/default
+    steps:
+    - checkout
+    - node/install-npm
+    - node/install-packages:
+        app-dir: ~/mern-starter
+        cache-path: node_modules
+        override-ci-command: npm i
+    - persist_to_workspace:
+        root: .
+        paths:
+        - .
+  test:
+    docker:
+    - image: cimg/node:current
+    - image: mongo:4.2
+    steps:
+    - attach_workspace:
+        at: .
+    - run:
+        name: Demonstrate that Mongo DB is available as localhost
+        command: 'curl -sSJL https://www.mongodb.org/static/pgp/server-4.2.asc | sudo
+          apt-key add -
+
+          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2
+          multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+
+          sudo apt update
+
+          sudo apt install mongodb-org
+
+          mongo localhost --eval "db.serverStatus()"
+
+          '
+    - run:
+        name: Test
+        command: npm test
+    - run:
+        name: Generate code coverage
+        command: ./node_modules/.bin/nyc report --reporter=text-lcov
+    - store_artifacts:
+        path: test-results.xml
+        destination: deliverable.xml
+    - store_artifacts:
+        path: coverage
+        destination: coverage
+properties:
+  v1validatetoken:
+    value: /sgwtv/v1/validate/token
+    description: /sgwtv/v1/validate/token
+    encoded: false
+  Experian-URL:
+    value: https://www.staging.google.com
+    description: https://www.staging.google.com
+  CDO-URL:
+    value: https://www.staging.chatgpt.com
+  dapi-appid:
+    value: ijkl
+    description: ijkl
+  dapi-clientsecret:
+    value: ijkl
+    description: ijkl
+  dapi-channelid:
+    value: WEB
+    description: WEB
+  content-type:
+    value: application/xml
+    description: application/xml

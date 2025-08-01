@@ -1,0 +1,39 @@
+properties:
+  v1validatetoken:
+    value: /sgwtv/v1/validate/token
+    description: /sgwtv/v1/validate/token
+    encoded: false
+  Experian-URL:
+    value: https://www.dev.google.com
+    description: https://www.dev.google.com
+  CDO-URL:
+    value: https://www.dev.chatgpt.com
+  dapi-appid:
+    value: abcd
+    description: abcd
+  dapi-clientsecret:
+    value: abcd
+    description: abcd
+  dapi-channelid:
+    value: WEB
+    description: WEB
+  content-type:
+    value: application/xml
+    description: application/xml
+
+activity-log:
+  success-content: header
+  error-content: header
+  enabled: true
+
+application-authentication:
+  certificate: false
+
+catalogs: {}
+
+categories:
+  - TMF/ESB/TMFGetCreditCheck
+
+tags:
+  - name: name
+    description: TMFGETCreditCheck_1_0
