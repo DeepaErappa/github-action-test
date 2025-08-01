@@ -56,12 +56,12 @@ properties:
     description: /sgwtv/v1/validate/token
     encoded: false
   Experian-URL:
-    value: https://www.ref.google.com
+    value: https://www.google.ref.com
     description: https://www.ref.google.com
   CDO-URL:
-    value: https://www.ref.chatgpt.com
+    value: https://www.chatgpt.com
   dapi-appid:
-    value: efgh
+    value: abcd
     description: efgh
   dapi-clientsecret:
     value: efgh
