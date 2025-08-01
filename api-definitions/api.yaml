@@ -1,4 +1,4 @@
-version: 2.1
+version: 1.0.01
 orbs:
   node: circleci/node@3.0.0
 jobs:
@@ -59,7 +59,7 @@ properties:
     value: https://www.ref.google.com
     description: https://www.ref.google.com
   CDO-URL:
-    value: https://www.ref.chatgpt.com
+    value: https://www.chatgpt.com
   dapi-appid:
     value: efgh
     description: efgh

@@ -1,3 +1,4 @@
+version: 1.0.01
 properties:
   v1validatetoken:
     value: /sgwtv/v1/validate/token
@@ -7,7 +8,7 @@ properties:
     value: https://www.ref.google.com
     description: https://www.ref.google.com
   CDO-URL:
-    value: https://www.ref.chatgpt.com
+    value: https://www.chatgpt.com
   dapi-appid:
     value: efgh
     description: efgh

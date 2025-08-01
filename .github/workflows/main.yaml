@@ -8,6 +8,9 @@ jobs:
   update-api-yaml:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
 
     steps:
       - name: Checkout target branch
@@ -27,7 +30,7 @@ jobs:
         run: |
           echo "Source: ${{ github.event.pull_request.head.ref }}"
           echo "Target: ${{ github.event.pull_request.base.ref }}"
-          python3 main.py "${{ github.event.pull_request.head.ref }}" "${{ github.event.pull_request.base.ref }}"
+          python3 .github/main.py "${{ github.event.pull_request.head.ref }}" "${{ github.event.pull_request.base.ref }}"
 
       - name: Configure Git
         run: |
