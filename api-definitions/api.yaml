@@ -1,5 +1,6 @@
 
 version: 1.0.02
+
 orbs:
   node: circleci/node@3.0.0
 jobs:
@@ -53,21 +54,20 @@ jobs:
         destination: coverage
 properties:
   v1validatetoken:
-    value: /sgwtv/v1/validate/token
-    description: /sgwtv/v1/validate/token
+    value: /identity/v1/validate/token
+    description: /identity/v1/validate/token
     encoded: false
   Experian-URL:
-    value: https://www.prod.google.com
-    description: https://www.prod.google.com
+    value: https://www.ref.google.com
+    description: https://www.ref.google.com
   CDO-URL:
-    value: https://www.prod.chatgpt.com
+    value: https://www.chatgpt.com
   dapi-appid:
-    value: ijkl
-    description: ijkl
+    value: efgh
+    description: efgh
   dapi-clientsecret:
-    value: ijkl
-    description: ijkl
-
+    value: efgh
+    description: efgh
   dapi-channelid:
     value: WEB
     description: WEB
