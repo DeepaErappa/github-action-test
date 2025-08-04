@@ -3,7 +3,7 @@ orbs:
   node: circleci/node@3.0.0
 jobs:
   build:
-    working_directory: ~/mern-starter
+    working_directory: ~/mern-starter/get
     executor: node/default
     steps:
     - checkout
