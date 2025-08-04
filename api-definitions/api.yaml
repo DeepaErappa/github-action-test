@@ -57,7 +57,7 @@ properties:
     encoded: false
   Experian-URL:
     value: https://www.ref.google.com
-    description: https://www.ref.google.com
+    description: https://www.ref.google.com/get-account-details
   CDO-URL:
     value: https://www.chatgpt.com
   dapi-appid:
