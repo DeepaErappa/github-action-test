@@ -1,20 +1,20 @@
-version: 1.0.01
+version: 1.0.10
 properties:
   v1validatetoken:
-    value: /sgwtv/v1/validate/token
-    description: /sgwtv/v1/validate/token
+    value: /identity/v1/validate/token
+    description: /identity/v1/validate/token
     encoded: false
-  Experian-URL:
-    value: https://www.ref.google.com
-    description: https://www.ref.google.com/get-account-details
+  CCC-URL:
+    value: https://ping.ref.central-credit-check.com/cvs
+    description: https://ping.ref.central-credit-check.com/cvs
   CDO-URL:
-    value: https://www.chatgpt.com
+    value: https://int.ref.api.tmf-poc-digital.co.uk/ccc/credit-check
   dapi-appid:
-    value: efgh
-    description: efgh
+    value: tmf-poc-thbs
+    description: tmf-poc-thbs
   dapi-clientsecret:
-    value: efgh
-    description: efgh
+    value: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
+    description: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
   dapi-channelid:
     value: WEB
     description: WEB
@@ -33,8 +33,4 @@ application-authentication:
 catalogs: {}
 
 categories:
-  - TMF/ESB/TMFGetCreditCheck
-
-tags:
-  - name: name
-    description: TMFGETCreditCheck_1_0
+  - tmf-poc/middle-ware/CentralCreditCheck
