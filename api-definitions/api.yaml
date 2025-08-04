@@ -66,6 +66,7 @@ properties:
   dapi-clientsecret:
     value: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
     description: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
+
   dapi-channelid:
     value: WEB
     description: WEB
