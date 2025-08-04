@@ -1,4 +1,4 @@
-version: 1.0.10
+version: 1.0.12
 orbs:
   node: circleci/node@3.0.0
 jobs:
@@ -56,17 +56,16 @@ properties:
     description: /identity/v1/validate/token
     encoded: false
   CCC-URL:
-    value: https://ping.staging.central-credit-check.com/cvs
-    description: https://ping.staging.central-credit-check.com/cvs
+    value: https://ping.central-credit-check.com/cvs
+    description: https://ping.central-credit-check.com/cvs
   CDO-URL:
-    value: https://int.staging.api.tmf-poc-digital.co.uk/ccc/credit-check
+    value: https://int.api.tmf-poc-digital.co.uk/ccc/credit-check
   dapi-appid:
     value: tmf-poc-thbs
     description: tmf-poc-thbs
   dapi-clientsecret:
     value: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
     description: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
-
   dapi-channelid:
     value: WEB
     description: WEB
