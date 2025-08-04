@@ -208,7 +208,7 @@ paths:
         The resource provides the capability to confirm the connection for a
         given customer.
       tags:
-        - /ConnectivityService
+        - /central-credit-check
       summary: >-
         The resource provides the capability to confirm the connection for a
         given customer.
