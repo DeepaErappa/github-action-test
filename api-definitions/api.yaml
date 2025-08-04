@@ -1,4 +1,4 @@
-version: 1.0.01
+version: 1.0.10
 orbs:
   node: circleci/node@3.0.0
 jobs:
@@ -55,20 +55,30 @@ properties:
     value: /identity/v1/validate/token
     description: /identity/v1/validate/token
     encoded: false
-  Experian-URL:
-    value: https://www.prod.google.com
-    description: https://www.prod.google.com
+  CCC-URL:
+    value: https://ping.staging.central-credit-check.com/cvs
+    description: https://ping.staging.central-credit-check.com/cvs
   CDO-URL:
-    value: https://www.prod.chatgpt.com
+    value: https://int.staging.api.tmf-poc-digital.co.uk/ccc/credit-check
   dapi-appid:
-    value: ijkl
-    description: ijkl
+    value: tmf-poc-thbs
+    description: tmf-poc-thbs
   dapi-clientsecret:
-    value: ijkl
-    description: ijkl
+    value: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
+    description: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
+
   dapi-channelid:
     value: WEB
     description: WEB
   content-type:
     value: application/xml
     description: application/xml
+  activity-log:
+    success-content: header
+    error-content: header
+    enabled: true
+  application-authentication:
+    certificate: false
+  catalogs: {}
+  categories:
+  - tmf-poc/middle-ware/CentralCreditCheck
