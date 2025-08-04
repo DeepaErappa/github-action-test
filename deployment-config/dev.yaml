@@ -1,37 +1,38 @@
+version: 1.0.9
 properties:
-  v1validatetoken:
-    value: /sgwtv/v1/validate/token
-    description: /sgwtv/v1/validate/token
-    encoded: false
-  Experian-URL:
-    value: https://www.dev.google.com
-    description: https://www.dev.google.com
-  CDO-URL:
-    value: https://www.dev.chatgpt.com
-  dapi-appid:
-    value: abcd
-    description: abcd
-  dapi-clientsecret:
-    value: abcd
-    description: abcd
-  dapi-channelid:
-    value: WEB
-    description: WEB
-  content-type:
-    value: application/xml
-    description: application/xml
-
-activity-log:
-  success-content: header
-  error-content: header
-  enabled: true
-
-application-authentication:
-  certificate: false
-
-catalogs: {}
-
-categories:
+    v1validatetoken:
+      value: /identity/v1/validate/token
+      description: /identity/v1/validate/token
+      encoded: false
+    CCC-URL:
+      value: https://ping.dev.central-credit-check.com/cvs
+      description: https://ping.dev.central-credit-check.com/cvs
+    CDO-URL:
+      value: https://int.api.tmf-poc-digital.co.uk/ccc/credit-check
+    dapi-appid:
+      value: tmf-poc-thbs
+      description: tmf-poc-thbs
+    dapi-clientsecret:
+      value: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
+      description: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
+    dapi-channelid:
+      value: WEB
+      description: WEB
+    content-type:
+      value: application/xml
+      description: application/xml
+  activity-log:
+    success-content: header
+    error-content: header
+    enabled: true
+  application-authentication:
+    certificate: false
+  catalogs: {}
+  categories:
+    - tmf-poc/middle-ware/CentralCreditCheck
+tags:
+  - name: name
+    description: CentralCreditCheck_1_0
   - TMF/ESB/TMFGetCreditCheck
 
 tags:

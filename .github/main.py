@@ -3,9 +3,8 @@ import subprocess
 import yaml
 import requests
 
-# File paths
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Go one level up to reach repo root
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 EXTERNAL_REPO = "DeepaErappa/git-config-files"  # e.g., "DeepaErappa/config-repo"
@@ -69,6 +68,7 @@ def replace_properties(env_yaml_file):
     if env_yaml_file in ["staging.yaml", "prod.yaml"]:
         print(f"[i] Fetching {env_yaml_file} from external repository")
         env_data = fetch_external_yaml_file(EXTERNAL_REPO, f"deployment-config/{env_yaml_file}", EXTERNAL_BRANCH)
+        print(env_data)
     else:
         env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
 
