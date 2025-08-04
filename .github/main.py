@@ -7,7 +7,7 @@ import requests
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Go one level up to reach repo root
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
-EXTERNAL_REPO = "DeepaErappa/git-config-files"  # e.g., "DeepaErappa/config-repo"
+EXTERNAL_REPO = "abhirup-vmo2/tmf-config-repo-apic"  # e.g., "DeepaErappa/config-repo"
 EXTERNAL_BRANCH = "main"  # or whatever branch holds the staging/prod.yaml
 
 # Absolute paths to API and config directories
