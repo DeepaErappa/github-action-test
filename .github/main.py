@@ -3,13 +3,18 @@ import subprocess
 import yaml
 import requests
 
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Go one level up to reach repo root
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
+EXTERNAL_REPO = "DeepaErappa/git-config-files"  # e.g., "DeepaErappa/config-repo"
+EXTERNAL_BRANCH = "main"  # or whatever branch holds the staging/prod.yaml
 
 # Absolute paths to API and config directories
 API_YAML = os.path.join(REPO_ROOT, "api-definitions", "api.yaml")
 CONFIG_DIR = os.path.join(REPO_ROOT, "deployment-config")
+GITHUB_TOKEN = os.getenv("GH_TOKEN")
+
 # Define merge paths and their corresponding config files
 MERGE_MAP = {
     ("dev", "reference"): "ref.yaml",
@@ -38,9 +43,35 @@ def write_yaml(path, data):
     with open(path, 'w') as file:
         yaml.dump(data, file, sort_keys=False)
 
+import base64
+import requests
+
+def fetch_external_yaml_file(repo, path, branch):
+    if not GITHUB_TOKEN:
+        raise EnvironmentError("GH_TOKEN not set in environment")
+
+    url = f"https://api.github.com/repos/{repo}/contents/{path}?ref={branch}"
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3.raw"
+    }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        raise RuntimeError(f"Failed to fetch {path} from {repo}@{branch}: {response.status_code} - {response.text}")
+
+    return yaml.safe_load(response.text)
+
+
 def replace_properties(env_yaml_file):
     api_data = load_yaml(API_YAML)
-    env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
+    if env_yaml_file in ["staging.yaml", "prod.yaml"]:
+        print(f"[i] Fetching {env_yaml_file} from external repository")
+        env_data = fetch_external_yaml_file(EXTERNAL_REPO, f"deployment-config/{env_yaml_file}", EXTERNAL_BRANCH)
+        print(env_data)
+    else:
+        env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
+
 
     if 'properties' not in env_data:
         raise KeyError(f"'properties' not found in {env_yaml_file}")
