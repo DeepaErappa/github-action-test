@@ -5,10 +5,10 @@ properties:
       description: /identity/v1/validate/token
       encoded: false
     CCC-URL:
-      value: https://ping.dev.central-credit-check.com/cvs
-      description: https://ping.dev.central-credit-check.com/cvs
+      value: https://ping.ref.central-credit-check.com/cvs
+      description: https://ping.ref.central-credit-check.com/cvs
     CDO-URL:
-      value: https://int.api.tmf-poc-digital.co.uk/ccc/credit-check
+      value: https://int.api.ref.tmf-poc-digital.co.uk/ccc/credit-check
     dapi-appid:
       value: tmf-poc-thbs
       description: tmf-poc-thbs
