@@ -18,13 +18,13 @@ jobs:
         - .
   test:
     docker:
-    - image: cimg/node:current
+    - image: cimg/node: current
     - image: mongo:4.2
     steps:
     - attach_workspace:
         at: .
     - run:
-        name: Demonstrate that Mongo DB is available as localhost
+        name: Demonstrate that MongoDB is available as localhost
         command: 'curl -sSJL https://www.mongodb.org/static/pgp/server-4.2.asc | sudo
           apt-key add -
 
