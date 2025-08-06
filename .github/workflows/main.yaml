@@ -116,4 +116,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: python3 .github/zip-and-push.py
+      - name: Cleanup .tmp-output folder
+        run: |
+          if [ -d ".tmp-output" ]; then
+            echo "Deleting .tmp-output..."
+            rm -rf .tmp-output
+          else
+            echo ".tmp-output does not exist."
+          fi
+
       
