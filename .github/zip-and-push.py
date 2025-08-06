@@ -24,6 +24,8 @@ def run(cmd, cwd=None):
     subprocess.run(cmd, shell=True, check=True, cwd=cwd)
 
 def create_zip():
+    zip_path = os.path.join(DEST_REPO_DIR, ZIP_FILENAME)
+
     
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
     
