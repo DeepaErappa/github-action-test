@@ -4,7 +4,8 @@ import subprocess
 import sys
 import zipfile
 
-TMP_OUTPUT_FILE = ".tmp-output/tmf-manage.yaml"
+API_DIR = "api-definitions"
+TMP_OUTPUT_DIR = ".tmp-output"
 DEPLOY_DESCRIPTOR = "deployment-config/deployment-descriptor.txt"
 ZIP_FILENAME = "collected_output.zip"
 DEST_REPO = "DeepaErappa/zip-files"
@@ -24,17 +25,29 @@ def run(cmd, cwd=None):
 
 def create_zip():
     with zipfile.ZipFile(ZIP_FILENAME, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        # Add the single deployment-descriptor file
+        # Step 1: Add all files from api-definitions
+        for root, dirs, files in os.walk(API_DIR):
+            for file in files:
+                abs_path = os.path.join(root, file)
+                rel_path = os.path.relpath(abs_path, '.')
+                zipf.write(abs_path, rel_path)
+
+        # Step 2: Overwrite matching files from .tmp-output (e.g., tmf-manage.yaml)
+        if os.path.exists(TMP_OUTPUT_DIR):
+            for file in os.listdir(TMP_OUTPUT_DIR):
+                tmp_file_path = os.path.join(TMP_OUTPUT_DIR, file)
+                if os.path.isfile(tmp_file_path):
+                    target_rel_path = os.path.join(API_DIR, file)
+                    zipf.write(tmp_file_path, target_rel_path)
+                    print(f"[✓] Overwrote {target_rel_path} with {tmp_file_path}")
+        else:
+            print(f"[!] {TMP_OUTPUT_DIR} not found, skipping overwrite")
+
+        # Step 3: Add only the deployment descriptor
         if os.path.exists(DEPLOY_DESCRIPTOR):
             zipf.write(DEPLOY_DESCRIPTOR, os.path.join("deployment-config", "deployment-descriptor.txt"))
         else:
             print(f"[!] {DEPLOY_DESCRIPTOR} not found")
-
-        # Add the tmf-manage.yaml from .tmp-output into api-definitions/
-        if os.path.exists(TMP_OUTPUT_FILE):
-            zipf.write(TMP_OUTPUT_FILE, os.path.join("api-definitions", "tmf-manage.yaml"))
-        else:
-            print(f"[!] {TMP_OUTPUT_FILE} not found")
 
     print(f"[✓] Created {ZIP_FILENAME}")
 
@@ -58,9 +71,9 @@ def commit_and_push():
     run("git push", cwd=DEST_REPO_DIR)
 
 def cleanup_tmp_folder():
-    if os.path.exists(".tmp-output"):
-        shutil.rmtree(".tmp-output")
-        print("[✓] Removed .tmp-output folder")
+    if os.path.exists(TMP_OUTPUT_DIR):
+        shutil.rmtree(TMP_OUTPUT_DIR)
+        print(f"[✓] Removed {TMP_OUTPUT_DIR} folder")
 
 def main():
     create_zip()
@@ -72,7 +85,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 # import os
 # import shutil
