@@ -1,6 +1,4 @@
-
-version: 1.0.02
-
+version: 1.0.01
 orbs:
   node: circleci/node@3.0.0
 jobs:
@@ -58,8 +56,8 @@ properties:
     description: /identity/v1/validate/token
     encoded: false
   Experian-URL:
-    value: https://www.dev.google.com
-    description: https://www.dev.google.com
+    value: https://www.ref.google.com
+    description: https://www.ref.google.com
   CDO-URL:
     value: https://www.chatgpt.com
   dapi-appid:
