@@ -390,17 +390,17 @@ x-ibm-configuration:
       value: /identity/v1/validate/token
       description: /identity/v1/validate/token
       encoded: false
-    CCC-URL:
-      value: https://ping.dev.central-credit-check.com/cvs
-      description: https://ping.dev.central-credit-check.com/cvs
+    Experian-URL:
+      value: https://www.ref.google.com
+      description: https://www.ref.google.com
     CDO-URL:
-      value: https://int.api.tmf-poc-digital.co.uk/ccc/credit-check
+      value: https://www.chatgpt.com
     dapi-appid:
-      value: tmf-poc-thbs
-      description: tmf-poc-thbs
+      value: efgh
+      description: efgh
     dapi-clientsecret:
-      value: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
-      description: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
+      value: efgh
+      description: efgh
     dapi-channelid:
       value: WEB
       description: WEB
@@ -452,3 +452,4 @@ paths:
       required: true
       description: Validating Bearer Token
       type: string
+version: 1.0.01
