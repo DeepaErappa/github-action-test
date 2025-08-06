@@ -11,7 +11,18 @@ EXTERNAL_REPO = "DeepaErappa/git-config-files"  # e.g., "DeepaErappa/config-repo
 EXTERNAL_BRANCH = "main"  # or whatever branch holds the staging/prod.yaml
 
 # Absolute paths to API and config directories
-API_YAML = os.path.join(REPO_ROOT, "api-definitions", "tmf-manage.yaml")
+import tempfile
+from pathlib import Path
+import shutil
+
+ORIGINAL_API_YAML = os.path.join(REPO_ROOT, "api-definitions", "tmf-manage.yaml")
+TMP_DIR = os.path.join(REPO_ROOT, ".tmp-output")
+os.makedirs(TMP_DIR, exist_ok=True)
+API_YAML = os.path.join(TMP_DIR, "tmf-manage.yaml")
+
+# Copy the original file to temporary location
+shutil.copy(ORIGINAL_API_YAML, API_YAML)
+
 CONFIG_DIR = os.path.join(REPO_ROOT, "deployment-config")
 GITHUB_TOKEN = os.getenv("GH_TOKEN")
 
