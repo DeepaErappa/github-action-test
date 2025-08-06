@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: tmf-manage-credit-vetting
   x-ibm-name: tmf-manage-credit-vetting
-  version: 1.0.9
+  version: 1.0.01
   description: API to connect to the Central Credit Check Service. This version is
     created for POC purposes
 schemes:
@@ -391,8 +391,8 @@ x-ibm-configuration:
       description: /identity/v1/validate/token
       encoded: false
     Experian-URL:
-      value: https://www.dev.google.com
-      description: https://www.dev.google.com
+      value: https://www.ref.google.com
+      description: https://www.ref.google.com
     CDO-URL:
       value: https://www.chatgpt.com
     dapi-appid:
