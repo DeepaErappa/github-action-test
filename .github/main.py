@@ -33,13 +33,12 @@ def get_last_merged_branch():
     return None
 
 def load_yaml(path):
-    with open(path, 'r') as file:
-        return yaml.safe_load(file)
+    with open(path, 'r') as f:
+        return yaml.safe_load(f)
 
 def write_yaml(path, data):
-    with open(path, 'w') as file:
-        yaml.dump(data, file, sort_keys=False, default_flow_style=False)
-
+    with open(path, 'w') as f:
+        yaml.dump(data, f, sort_keys=False, default_flow_style=False)
 def fetch_external_yaml_file(repo, path, branch):
     if not GITHUB_TOKEN:
         raise EnvironmentError("GH_TOKEN not set in environment")
@@ -56,34 +55,30 @@ def fetch_external_yaml_file(repo, path, branch):
 
     return yaml.safe_load(response.text)
 
-def replace_properties(env_yaml_file):
-    # Load your full API YAML
-    api_data = load_yaml(API_YAML)
+def replace_properties(api_yaml_path, new_properties_yaml_path):
+    # Load full API YAML
+    api_data = load_yaml(api_yaml_path)
+    
+    # Load new properties
+    new_props_data = load_yaml(new_properties_yaml_path)
 
-    # Load environment config YAML either locally or from GitHub repo
-    if env_yaml_file in ["staging.yaml", "prod.yaml"]:
-        print(f"[i] Fetching {env_yaml_file} from external repository")
-        env_data = fetch_external_yaml_file(EXTERNAL_REPO, f"deployment-config/{env_yaml_file}", EXTERNAL_BRANCH)
-    else:
-        env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
+    if 'properties' not in new_props_data:
+        raise KeyError("New properties YAML must contain top-level 'properties' key")
 
-    if 'properties' not in env_data:
-        raise KeyError(f"'properties' not found in {env_yaml_file}")
+    # Debug prints (optional)
+    print("Keys before replacement:", list(api_data.keys()))
+    print("Existing properties keys:", list(api_data.get('properties', {}).keys()))
+    print("New properties keys:", list(new_props_data['properties'].keys()))
 
-    old_properties = api_data.get('properties', {})
-    new_properties = env_data['properties']
+    # Replace the existing 'properties' section completely
+    api_data['properties'] = new_props_data['properties']
 
-    print("Before update, properties keys:", list(old_properties.keys()))
-    print("New properties keys:", list(new_properties.keys()))
+    # Write full updated YAML back
+    write_yaml(api_yaml_path, api_data)
 
-    # Replace only the 'properties' key
-    api_data['properties'] = new_properties
+    print(f"Successfully replaced 'properties' section in {api_yaml_path}")
 
-    # Write back to the yaml file preserving structure and order
-    write_yaml(API_YAML, api_data)
-
-    print(f"[✓] Updated 'properties' in {API_YAML} using {env_yaml_file}")
-
+# Usage example:
 def main():
     if len(sys.argv) == 3:
         source_branch = sys.argv[1]
