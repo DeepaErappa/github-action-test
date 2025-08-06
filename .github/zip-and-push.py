@@ -80,7 +80,7 @@ def cleanup_tmp_folder():
 def main():
     create_zip()
     clone_dest_repo()
-    
+    copy_zip_to_repo()
     commit_and_push()
     cleanup_tmp_folder()
     print("[✓] Zip pushed to target repo and cleaned up.")
