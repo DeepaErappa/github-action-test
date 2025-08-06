@@ -88,8 +88,10 @@ def replace_properties(env_yaml_file):
 
     # Update version if present
     if 'version' in env_data:
-        api_data['version'] = env_data['version']
-        print(f"[✓] Updated 'version' in {API_YAML} to {env_data['version']}")
+        if 'info' not in api_data:
+            api_data['info'] = {}
+        api_data['info']['version'] = env_data['version']
+        print(f"[✓] Updated 'info.version' in {API_YAML} to {env_data['version']}")
     else:
         print(f"[i] 'version' not found in {env_yaml_file}, skipping version update.")
 
