@@ -11,7 +11,18 @@ EXTERNAL_REPO = "DeepaErappa/git-config-files"  # e.g., "DeepaErappa/config-repo
 EXTERNAL_BRANCH = "main"  # or whatever branch holds the staging/prod.yaml
 
 # Absolute paths to API and config directories
-API_YAML = os.path.join(REPO_ROOT, "api-definitions", "api.yaml")
+import tempfile
+from pathlib import Path
+import shutil
+
+ORIGINAL_API_YAML = os.path.join(REPO_ROOT, "api-definitions", "tmf-manage.yaml")
+TMP_DIR = os.path.join(REPO_ROOT, ".tmp-output")
+os.makedirs(TMP_DIR, exist_ok=True)
+API_YAML = os.path.join(TMP_DIR, "tmf-manage.yaml")
+
+# Copy the original file to temporary location
+shutil.copy(ORIGINAL_API_YAML, API_YAML)
+
 CONFIG_DIR = os.path.join(REPO_ROOT, "deployment-config")
 GITHUB_TOKEN = os.getenv("GH_TOKEN")
 
@@ -62,32 +73,44 @@ def fetch_external_yaml_file(repo, path, branch):
 
     return yaml.safe_load(response.text)
 
+def recursive_replace_properties(data, new_properties):
+    if isinstance(data, dict):
+        for key in list(data.keys()):
+            if key == 'properties':
+                print(f"[✓] Replacing 'properties' at nested path.")
+                data[key] = new_properties
+            else:
+                recursive_replace_properties(data[key], new_properties)
+    elif isinstance(data, list):
+        for item in data:
+            recursive_replace_properties(item, new_properties)
 
 def replace_properties(env_yaml_file):
     api_data = load_yaml(API_YAML)
+
     if env_yaml_file in ["staging.yaml", "prod.yaml"]:
         print(f"[i] Fetching {env_yaml_file} from external repository")
         env_data = fetch_external_yaml_file(EXTERNAL_REPO, f"deployment-config/{env_yaml_file}", EXTERNAL_BRANCH)
-        print(env_data)
     else:
         env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
 
-
     if 'properties' not in env_data:
         raise KeyError(f"'properties' not found in {env_yaml_file}")
+
     # Update version if present
     if 'version' in env_data:
-        api_data['version'] = env_data['version']
-        print(f"[✓] Updated 'version' in {API_YAML} to {env_data['version']}")
+        if 'info' not in api_data:
+            api_data['info'] = {}
+        api_data['info']['version'] = env_data['version']
+        print(f"[✓] Updated 'info.version' in {API_YAML} to {env_data['version']}")
     else:
         print(f"[i] 'version' not found in {env_yaml_file}, skipping version update.")
 
+    # Replace all nested 'properties'
+    recursive_replace_properties(api_data, env_data['properties'])
 
-    api_data['properties'] = env_data['properties']
     write_yaml(API_YAML, api_data)
-    print(f"[✓] Updated 'properties' in {API_YAML} using {env_yaml_file}")
-
-
+    print(f"[✓] Replaced all 'properties' in {API_YAML} using {env_yaml_file}")
 
 # def main():
 #     current_branch = get_current_branch()
