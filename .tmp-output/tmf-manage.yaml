@@ -1,0 +1,454 @@
+swagger: '2.0'
+info:
+  title: tmf-manage-credit-vetting
+  x-ibm-name: tmf-manage-credit-vetting
+  version: 1.0.01
+  description: API to connect to the Central Credit Check Service. This version is
+    created for POC purposes
+schemes:
+- https
+basePath: /apic
+security:
+- X-IBM-Client-Id: []
+  X-IBM-Client-Secret: []
+securityDefinitions:
+  X-IBM-Client-Id:
+    type: apiKey
+    description: Unique Id for each consumer and acts as a public identifier for apps
+      and used for consumer authentication at API Connect layer.
+    name: X-IBM-Client-Id
+    in: header
+    x-key-type: client_id
+  X-IBM-Client-Secret:
+    type: apiKey
+    description: Unique Id used by the Client to authenticate to the Authorisation
+      Server.
+    name: X-IBM-Client-Secret
+    in: header
+    x-key-type: client_secret
+x-ibm-configuration:
+  cors:
+    enabled: true
+  gateway: datapower-api-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  assembly:
+    execute:
+    - gatewayscript:
+        version: 2.0.0
+        title: GS-ExtractInputLoggingData
+        source: "/* *****************************************************************************************************************\
+          \ */\r\n/* ********************************************************************************************************************\
+          \  ********************************************************************************************************************\
+          \ */\r\n/* Purpose: This GW Script will extract input metadata for logging\
+          \                                                      */              \
+          \                                                                    \r\n\
+          /* ********************************************************************************************************************\
+          \ */\r\nvar apim=require('apim');\r\n\r\n//Extract current system date-time\r\
+          \nvar systemDateTime = apim.getvariable('system.datetime');\r\n\r\n//Record\
+          \ Transaction start time and set it in a context variable\r\nvar apiStartTimeMS\
+          \ = (new Date()).getTime();\r\napim.setvariable('apiStartTimeMS', apiStartTimeMS);\r\
+          \n\r\n//Generate uuid and set it as apic-transaction-id\r\nvar apicTxId\
+          \ = \"\";\r\nif (apim.getvariable('request.headers.apic-transaction-id')){\r\
+          \n    apicTxId = apim.getvariable('request.headers.apic-transaction-id');\r\
+          \n}\r\nelse {\r\n    apicTxId = uuidv4();\r\n}\r\n\r\n//Extract all transaction\
+          \ ids and user informaation\r\nvar xGlobalTxId = apim.getvariable('request.headers.x-global-transaction-id');\r\
+          \nvar xclientTxId= apim.getvariable('request.headers.x-client-transaction-id');\r\
+          \nvar xRequestingUser= apim.getvariable('request.headers.x-requesting-user');\r\
+          \nvar clientApp = apim.getvariable('client.app.name');\r\n\r\n//Set all\
+          \ transaction ids in context variables and current context headers\r\napim.setvariable('apic-transaction-id',\
+          \ apicTxId);\r\napim.setvariable('x-glbal-transaction-id', xGlobalTxId);\r\
+          \napim.setvariable('x-client-transaction-id', xclientTxId);\r\napim.setvariable('message.headers.apic-transaction-id',\
+          \ apicTxId);\r\napim.setvariable('message.headers.x-global-transaction-id',\
+          \ xGlobalTxId);\r\napim.setvariable('message.headers.x-client-transaction-id',\
+          \ xclientTxId);\r\n\r\nvar xRateLimit = apim.getvariable('message.headers.X-RateLimit-Limit');\r\
+          \nvar xRateLimitRemaining = apim.getvariable('message.headers.X-RateLimit-Remaining');\r\
+          \nvar xRateLimitPerDay;\r\nvar xRateLimitPerSecond;\r\nvar xRateLimitRemainingPerDay;\r\
+          \nvar xRateLimitRemainingPerSecond;\r\n\r\nif(xRateLimit != undefined &&\
+          \ xRateLimitRemaining != undefined ){\r\n//Extract RateLimit-Limit Day and\
+          \ RateLimit-Limit Second\r\n    xRateLimitPerDay = xRateLimit.substring(0,\
+          \ xRateLimit.indexOf(';')).replace(/\\D/g,'');\r\n    xRateLimitPerSecond\
+          \ = xRateLimit.substring(xRateLimit.lastIndexOf('name'), xRateLimit.lastIndexOf(';')).replace(/\\\
+          D/g,'');\r\n    xRateLimitRemainingPerDay = xRateLimitRemaining.substring(0,\
+          \ xRateLimitRemaining.indexOf(';')).replace(/\\D/g,'');\r\n    xRateLimitRemainingPerSecond\
+          \ = xRateLimitRemaining.substring(xRateLimitRemaining.lastIndexOf('name'),\
+          \ xRateLimitRemaining.lastIndexOf(';')).replace(/\\D/g,'');\r\n}else{\r\n\
+          \    xRateLimitPerDay = 'unlimited';\r\n    xRateLimitPerSecond = 'unlimited';\r\
+          \n    xRateLimitRemainingPerDay = 'unlimited';\r\n    xRateLimitRemainingPerSecond\
+          \ = 'unlimited';\r\n}\r\n\r\n//Extract api metadata from system variables\r\
+          \nvar apiName = apim.getvariable('api.name');\r\nvar apiVersion = apim.getvariable('api.version');\r\
+          \n\r\n//Extract Organization and catalog names\r\nvar orgName = apim.getvariable('api.org.name');\r\
+          \nvar catalog = apim.getvariable('env.path');\r\nvar clientOrgName = apim.getvariable('client.org.name');\r\
+          \n\r\n//Set Rate Limit per day, Rate Limit per second, Rate Limit Remaining\
+          \ per Day and Rate Limit Remaining Per Second\r\napim.setvariable('xRateLimitPerDay',\
+          \ xRateLimitPerDay);\r\napim.setvariable('xRateLimitPerSecond', xRateLimitPerSecond);\r\
+          \napim.setvariable('xRateLimitRemainingPerDay', xRateLimitRemainingPerDay);\r\
+          \napim.setvariable('xRateLimitRemainingPerSecond', xRateLimitRemainingPerSecond);\r\
+          \n\r\n//Extract request metadata from apic context variables\r\nvar requestURI\
+          \ = apim.getvariable('request.uri');\r\nif (requestURI.includes('?')){\r\
+          \n    requestURI = requestURI.substring(0, requestURI.indexOf('?'));\r\n\
+          }\r\nvar contentType = apim.getvariable('message.headers.content-type');\r\
+          \n\r\n//Build custm log string\r\nvar logString = \"type:=request\"\r\n\
+          \                + \" | system-datetime:=\" +        systemDateTime\r\n\
+          \                + \" | apic-transaction-id:=\" +    apicTxId\r\n      \
+          \          + \" | global-transaction-id:=\" +  xGlobalTxId\r\n         \
+          \       + \" | x-client-transaction-id:=\"+ xclientTxId\r\n            \
+          \    + \" | xRequestingUser:=\" +        xRequestingUser\r\n           \
+          \     + \" | client-org-name:=\" +        clientOrgName\r\n            \
+          \    + \" | client-app-name:=\" +        clientApp\r\n                +\
+          \ \" | provider-org-name:=\" +      orgName\r\n                + \" | catalog-name:=\"\
+          \ +           catalog\r\n                + \" | api-name:=\" +         \
+          \      apiName\r\n                + \" | api-version:=\" +            apiVersion\r\
+          \n                + \" | request-uri:=\" +            requestURI\r\n\t\t\
+          \t\t+ \" | RateLimit-Day=\" +        xRateLimitPerDay\r\n              \
+          \  + \" | RateLimit-Second=\" +     xRateLimitPerSecond\r\n            \
+          \    + \" | RateLimit-Remaining-Day=\" +    xRateLimitRemainingPerDay\r\n\
+          \                + \" | RateLimit-Remaining-Second=\" + xRateLimitRemainingPerSecond\r\
+          \n                ;\r\n                \r\nconsole.options({'category':\
+          \ 'apic-'+orgName}).log(logString);\r\nlogString = \"\";\r\napim.setvariable('logString',\
+          \ logString);\r\n\r\n//Generate apicURLPrefix for all delegator calls\r\n\
+          var apicURLPrefix = apim.getvariable('request.uri').substring(0, apim.getvariable('request.uri').indexOf('/'+orgName+'/'+catalog))\
+          \ + \"/\" + orgName + \"/\" + catalog;\r\napim.setvariable('apicURLPrefix',\
+          \ apicURLPrefix);\r\n\r\n//this function generates uuid string to be used\
+          \ as apic transaction id\r\nfunction uuidv4() {\r\n    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,\
+          \ function (c) {\r\n        var r = Math.random() * 16 | 0, v = c == 'x'\
+          \ ? r: (r & 0x3 | 0x8);\r\n        return v.toString(16);\r\n    });\r\n\
+          }"
+    - invoke:
+        title: Invoke-TokenValidate
+        version: 2.0.0
+        verb: GET
+        target-url: $(apicURLPrefix)$(v1validatetoken)?x-jwttoken=$(request.headers.authorization)&x-consumer=$(client.app.name)
+        follow-redirects: false
+        timeout: 60
+        parameter-control:
+          type: whitelist
+          values: []
+        header-control:
+          type: blacklist
+          values:
+          - ^X-IBM-Client-Id$
+        inject-proxy-headers: false
+        tls-profile: tmf-internal-tls-client-profile:1.0.0
+        cache-response: time-to-live
+        cache-ttl: 900
+        output: invokeResponse
+    - gatewayscript:
+        version: 2.0.0
+        title: GS-CheckHeaders
+        source: "/* ********************************************************************************************************************\
+          \ */\r\n/* ********************************************************************************************************************\
+          \  ********************************************************************************************************************\
+          \ */\r\n/* Purpose: This GW Script will extract input metadata for logging\
+          \                                                      */\r\n/* ********************************************************************************************************************\
+          \ */\r\n\r\nvar apim = require('apim');\r\n\r\nvar requestHeaders = apim.getvariable('request.headers');\r\
+          \nconsole.info('Request Headers:', JSON.stringify(requestHeaders));\r\n\r\
+          \nconsole.log('Headers while calling backend',context.message.headers);\r\
+          \n\r\nvar TargetSystem = apim.getvariable('request.headers.targetsystem');\r\
+          \nconsole.log(\"Value of targetsystem header: \" + TargetSystem);\r\nif\
+          \ (TargetSystem) {\r\n    apim.setvariable('targetSystemCheck', 'true');\r\
+          \n} else {\r\n    apim.setvariable('targetSystemCheck', 'false');\r\n}\r\
+          \n\r\nconsole.log(\"targetSystemCheck Value::\" + apim.getvariable('targetSystemCheck'));\r\
+          \n"
+    - gatewayscript:
+        version: 2.0.0
+        title: GS-CheckTokenValidation
+        source: "var apim=require('apim');\nvar tokenValidatorResponse= context.getMessage('invokeResponse');\n\
+          if (tokenValidatorResponse.statusCode != 200) {\n    apim.setvariable('errorName',\
+          \ 'AuthError');\n    apim.setvariable('StatusCode', tokenValidatorResponse.statusCode);\n\
+          \    apim.setvariable('StatusReason', tokenValidatorResponse.status.reason);\n\
+          \    apim.setvariable('ErrorMessage', apim.getvariable('invokeResponse.body'));\n\
+          \    apim.error(\"AuthError\", 401, \"Authorization Invalid\", \"Authorization\
+          \ failed\");\n}else{\n    var host = apim.getvariable('api.properties.CDO-URL');\n\
+          \    var path = apim.getvariable('request.path');\n    path = path.replace(\"\
+          /apic\",\"\");\n    var backendEndpoint = host + path;\n    apim.setvariable('backendEndpoint',backendEndpoint);\n\
+          }"
+    - gatewayscript:
+        version: 2.0.0
+        title: GS-SetRequestHeader
+        source: "/* ********************************************************************************************************************\
+          \ */\r\n/* ********************************************************************************************************************\
+          \ ********************************************************************************************************************\
+          \ */\r\n/* Purpose: This GW Script will extract input metadata for logging\
+          \                                                      */\r\n/* ********************************************************************************************************************\
+          \ */\r\nvar apim = require('apim');\r\n\r\nvar xclientTxId = apim.getvariable('request.headers.x-client-transaction-id');\r\
+          \nvar apicTxId = apim.getvariable('apic-transaction-id');\r\nvar workflow_name\
+          \ = apim.getvariable('workflow_name');\r\napim.setvariable('message.headers.dapi-channelid',\
+          \ apim.getvariable('api.properties.dapi-channelid'));\r\napim.setvariable('message.headers.dapi-appid',\
+          \ apim.getvariable('api.properties.dapi-appid'));\r\napim.setvariable('message.headers.dapi-clientsecret',\
+          \ apim.getvariable('api.properties.dapi-clientsecret'));\r\napim.setvariable('message.headers.content-type',\
+          \ apim.getvariable('api.properties.content-type'));\r\napim.setvariable('message.headers.dapi-correlationid',\
+          \ apicTxId);\r\napim.setvariable('message.headers.dapi-requestid', apicTxId);\r\
+          \nvar timestamp = apim.getvariable('system.datetime');\r\n\r\n// Append\
+          \ 'Z' if not already there\r\nif (!timestamp.endsWith('Z')) {\r\n    timestamp\
+          \ = timestamp + 'Z';\r\n}\r\n\r\n// Trim milliseconds to 2 digits if they\
+          \ exist\r\ntimestamp = timestamp.replace(/\\.(\\d{2})\\d+Z$/, '.$1Z');\r\
+          \n\r\napim.setvariable('message.headers.dapi-requesttimestamp', timestamp);\r\
+          \n\r\n\r\n\r\n// Logging the values\r\nconsole.log('workflow_name:', workflow_name);\r\
+          \nconsole.log('dapi-channelid:', apim.getvariable('message.headers.dapi-channelid'));\r\
+          \nconsole.log('dapi-appid:', apim.getvariable('message.headers.dapi-appid'));\r\
+          \nconsole.log('dapi-clientsecret:', apim.getvariable('message.headers.dapi-clientsecret'));\r\
+          \nconsole.log('content-type:', apim.getvariable('message.headers.content-type'));\r\
+          \nconsole.log('dapi-correlationid:', apim.getvariable('message.headers.dapi-correlationid'));\r\
+          \nconsole.log('dapi-requestid:', apim.getvariable('message.headers.dapi-requestid'));\r\
+          \nconsole.log('dapi-requesttimestamp:', apim.getvariable('message.headers.dapi-requesttimestamp'));\r\
+          \n"
+    - invoke:
+        version: 2.0.0
+        title: Invoke-CDO
+        header-control:
+          type: blocklist
+          values: []
+        parameter-control:
+          type: allowlist
+          values: []
+        verb: POST
+        cache-response: time-to-live
+        cache-ttl: 900
+        target-url: $(backendEndpoint)
+        tls-profile: cdo-one-way-tls-client-profile:1.0.0
+        persistent-connection: true
+        timeout: 110
+    - gatewayscript:
+        version: 2.0.0
+        title: GS-ExtractFinalLoggingData
+        source: "/* *************************************************************************************************************\
+          \ */\r\n/* *************************************************************************************************************\
+          \  *************************************************************************************************************\
+          \ */\r\n/* Purpose: This GW Script will extract final metadata for logging\
+          \                                               */\r\n/*               \
+          \                                                                      \
+          \                          */\r\n/* Required params:                   \
+          \                                                                      \
+          \     */\r\n/* ***************************************************************************************************************/\r\
+          \nvar apim=require('apim');\r\n\r\n//Extract current system date-time\r\n\
+          var systemDateTime = apim.getvariable('system.datetime');\r\n\r\n//Extract\
+          \ all transaction ids and user informaation\r\nvar apicTxId = apim.getvariable('apic-transaction-id');\r\
+          \nvar xGlobalTxId = apim.getvariable('request.headers.X-Global-Transaction-ID');\r\
+          \nvar xclientTxId= apim.getvariable('request.headers.x-client-transaction-id');\r\
+          \nvar xRequestingUser= apim.getvariable('request.headers.X-Requesting-User');\r\
+          \nvar clientApp = apim.getvariable('client.app.name');\r\n\r\n//Extratct\
+          \ Ratelimit Values\r\nvar RateLimitPerDay = apim.getvariable('xRateLimitPerDay');\r\
+          \nvar RateLimitPerSecond = apim.getvariable('xRateLimitPerSecond');\r\n\
+          var RateLimitRemainingPerDay = apim.getvariable('xRateLimitRemainingPerDay');\r\
+          \nvar RateLimitRemainingPerSecond = apim.getvariable('xRateLimitRemainingPerSecond');\r\
+          \n\r\n//Extract all details related to API and request\r\nvar apiName =\
+          \ apim.getvariable('api.name');\r\nvar apiVersion = apim.getvariable('api.version');\r\
+          \n\r\n//Extract Organization and catalog names\r\nvar orgName = apim.getvariable('api.org.name');\r\
+          \nvar catalog = apim.getvariable('env.path');\r\nvar clientOrgName = apim.getvariable('client.org.name');\r\
+          \n\r\n//Extract request metadata from apic context variables\r\nvar requestURI\
+          \ = apim.getvariable('request.uri');\r\nif (requestURI.includes('?')){\r\
+          \n    requestURI = requestURI.substring(0, requestURI.indexOf('?'));\r\n\
+          }\r\nvar contentType = apim.getvariable('message.headers.content-type');\r\
+          \n\r\n//Extract all response status details\r\nvar responseStatusCode =\
+          \ apim.getvariable('message.status.code');\r\nvar responseStatusReason =\
+          \ apim.getvariable('message.status.reason');\r\n\r\n//calculate time elapsed\r\
+          \nvar apiStartTimeMS = apim.getvariable('apiStartTimeMS');\r\nvar apiEndTimeMS\
+          \ = (new Date()).getTime();\r\nvar totalTimeElapsed = (apiEndTimeMS - apiStartTimeMS)\
+          \ + \" ms\";\r\n\r\n//Build custm log string\r\nvar logString = \"type:=response\"\
+          \r\n                + \" | system-datetime:=\" +        systemDateTime\r\
+          \n                + \" | apic-transaction-id:=\" +    apicTxId\r\n     \
+          \           + \" | global-transaction-id:=\" +  xGlobalTxId\r\n        \
+          \        + \" | x-client-transaction-id:=\"+ xclientTxId\r\n           \
+          \     + \" | xRequestingUser:=\" +        xRequestingUser\r\n          \
+          \      + \" | client-org-name:=\" +        clientOrgName\r\n           \
+          \     + \" | client-app-name:=\" +        clientApp\r\n                +\
+          \ \" | provider-org-name:=\" +      orgName\r\n                + \" | catalog-name:=\"\
+          \ +           catalog\r\n                + \" | api-name:=\" +         \
+          \      apiName\r\n                + \" | api-version:=\" +            apiVersion\r\
+          \n                + \" | request-uri:=\" +            requestURI\r\n   \
+          \             + \" | response-status-code:=\" +   responseStatusCode\r\n\
+          \                + \" | response-status-reason:=\" + responseStatusReason\r\
+          \n\t\t\t\t+ \" | RateLimit-Day=\" +              RateLimitPerDay\r\n   \
+          \             + \" | RateLimit-Second=\" +           RateLimitPerSecond\r\
+          \n                + \" | RateLimit-Remaining-Day=\" +    RateLimitRemainingPerDay\r\
+          \n                + \" | RateLimit-Remaining-Second=\" + RateLimitRemainingPerSecond\r\
+          \n                + apim.getvariable('logString')\r\n                + \"\
+          \ | total-time-elapsed:=\" +     totalTimeElapsed\r\n                ;\r\
+          \nconsole.options({'category': 'apic-'+orgName}).log(logString);\r\n\r\n\
+          // Suppressing response headers \r\nvar responsHeaders={};\r\nvar responsHeadersArray=[];\r\
+          \nresponsHeaders = context.get('message.headers');\r\nresponsHeadersArray=\
+          \ Object.keys(responsHeaders);\r\nfor(var i=0;i< responsHeadersArray.length;i++)\r\
+          \n{\r\n    context.message.header.remove(responsHeadersArray[i]);\r\n}\r\
+          \n// Setting required transaction Response headers\r\napim.setvariable('message.headers.apic-transaction-id',\
+          \ apicTxId);\r\napim.setvariable('message.headers.X-Global-Transaction-ID',xGlobalTxId);\r\
+          \napim.setvariable('message.headers.x-client-transaction-id', xclientTxId);\r\
+          \napim.setvariable('message.headers.content-type', contentType);\r\n\r\n\
+          // Setting rate limit headers\r\napim.setvariable('message.headers.RateLimitPerDay',\
+          \ RateLimitPerDay);\r\napim.setvariable('message.headers.RateLimitPerSecond',\
+          \ RateLimitPerSecond);\r\napim.setvariable('message.headers.RateLimitRemainingPerDay',\
+          \ RateLimitRemainingPerDay);\r\napim.setvariable('message.headers.RateLimitRemainingPerSecond',\
+          \ RateLimitRemainingPerSecond);"
+    catch:
+    - errors:
+      - ConnectionError
+      - OperationError
+      - default
+      - InvalidTokenError
+      - AuthError
+      - SOAPError
+      - BackendError
+      execute:
+      - gatewayscript:
+          version: 2.0.0
+          title: GS-ErrorHandling
+          source: '/* ******************************************************************************************************************
+            */
+
+            /* ******************************************************************************************************************
+            */
+
+            /* FileName                           Version    Created By                  Modified
+            By               Date           */
+
+            /* xxx.js                   1.0        XXXXX XXX                                          XX-XXX-20XX    */
+
+            /*                                                                                                                    */
+
+            /* ******************************************************************************************************************
+            */
+
+            /* Purpose: This GW Script file will read error config for the catch block
+            error name and will set the necessary      */
+
+            /*          params like status code, reason phrase and will return the
+            error json                                     */
+
+            /* Required params: errorName                                                                                         */
+
+            /* ******************************************************************************************************************
+            */
+
+            var apim=require(''apim'');
+
+            apim.setvariable(''message.status.code'', parseInt(apim.getvariable(''StatusCode'')));
+
+            apim.setvariable(''message.status.reason'', apim.getvariable(''StatusReason''));
+
+            apim.setvariable(''message.body'', apim.getvariable(''ErrorMessage''));
+
+            '
+      - gatewayscript:
+          version: 2.0.0
+          title: GS-ExtractErrorLoggingData
+          source: "/* *************************************************************************************************************\
+            \ */\r\n/* *************************************************************************************************************\
+            \ *************************************************************************************************************\
+            \ */\r\n/* Purpose: This GW Script will extract error metadata for logging\
+            \                                               */\r\n/*             \
+            \                                                                    \
+            \                              */\r\n/* Required params:             \
+            \                                                                    \
+            \             */\r\n/* ***************************************************************************************************************/\r\
+            \nvar apim=require('apim');\r\n//Extract general metadata from system\
+            \ variables\r\nvar systemDateTime = apim.getvariable('system.datetime');\r\
+            \nvar apicTxId = apim.getvariable('apic-transaction-id');\r\nvar xclientTxId=\
+            \ apim.getvariable('x-client-transaction-id');\r\nvar xGlobalTxId = apim.getvariable('request.headers.x-global-transaction-id');\r\
+            \nvar requestURI = apim.getvariable('request.uri');\r\nvar apiName = apim.getvariable('api.name');\r\
+            \nvar orgName = apim.getvariable('api.org.name');\r\nvar contentType =\
+            \ apim.getvariable('message.headers.content-type');\r\nvar xRequestingUser=\
+            \ apim.getvariable('request.headers.X-Requesting-User');\r\nvar path =\
+            \ apim.getvariable('request.path');\r\nvar operationName = path.replace(\"\
+            /apic/Payment/\",\"\");\r\nvar responseStatusCode = apim.getvariable('message.status.code');\r\
+            \nvar responseStatusReason = apim.getvariable('message.status.reason');\r\
+            \nvar errorName = apim.getvariable('errorName');\r\n\r\n//Extratct Ratelimt\
+            \ Values\r\nvar RateLimitPerDay = apim.getvariable('xRateLimitPerDay');\r\
+            \nvar RateLimitPerSecond = apim.getvariable('xRateLimitPerSecond');\r\n\
+            var RateLimitRemainingPerDay = apim.getvariable('xRateLimitRemainingPerDay');\r\
+            \nvar RateLimitRemainingPerSecond = apim.getvariable('xRateLimitRemainingPerSecond');\r\
+            \n\r\n//calculate time elapsed\r\nvar apiStartTimeMS = apim.getvariable('apiStartTimeMS');\r\
+            \nvar apiEndTimeMS = (new Date()).getTime();\r\nvar totalTimeElapsed =\
+            \ (apiEndTimeMS - apiStartTimeMS) + \" ms\";\r\nvar logString = \"type:=error\"\
+            \r\n+ \" | system-datetime:=\" + systemDateTime\r\n+ \" | apic-transaction-id:=\"\
+            \ + apicTxId\r\n+ \" | global-transaction-id:=\" + xGlobalTxId\r\n+ \"\
+            \ | x-client-transaction-id:=\"+ xclientTxId\r\n+ \" | xRequestingUser:=\"\
+            \ + xRequestingUser\r\n+ \" | api-name:=\" + apiName\r\n+ \" | provider-org-name:=\"\
+            \ +      orgName\r\n+ \" | request-uri:=\" + requestURI\r\n+ \" | response-status-code:=\"\
+            \ + responseStatusCode\r\n+ \" | response-status-reason:=\" + responseStatusReason\r\
+            \n+ \" | RateLimit-Day=\" +        RateLimitPerDay\r\n+ \" | RateLimit-Second=\"\
+            \ +     RateLimitPerSecond\r\n+ \" | RateLimit-Remaining-Day=\" +    RateLimitRemainingPerDay\r\
+            \n+ \" | RateLimit-Remaining-Second=\" + RateLimitRemainingPerSecond\r\
+            \n+ apim.getvariable('logString')\r\n+ \" | total-time-elapsed:=\" + totalTimeElapsed\r\
+            \n+ \" | alarmKey:=\" + apiName +\"#\"+operationName+ \"#error#\"+ errorName\
+            \ +\"#\"+responseStatusCode\r\n+ \" | error-name:=\" + errorName\r\n;\r\
+            \nconsole.options({'category': 'apic-'+orgName}).log(logString);\r\n\r\
+            \n\r\nvar reqHeaders={};\r\nvar headerKeys=[];\r\nreqHeaders = context.get('message.headers');\r\
+            \nheaderKeys= Object.keys(reqHeaders);\r\nfor(var i=0;i< headerKeys.length;i++){\r\
+            \ncontext.message.header.remove(headerKeys[i]);\r\n}\r\n\r\n// Setting\
+            \ required transaction Response headers\r\napim.setvariable('message.headers.apic-transaction-id',\
+            \ apicTxId);\r\napim.setvariable('message.headers.x-client-transaction-id',\
+            \ xclientTxId);\r\napim.setvariable('message.headers.X-Global-Transaction-ID',xGlobalTxId);\r\
+            \napim.setvariable('message.headers.content-type', contentType);\r\n\r\
+            \n// Setting rate limit headers\r\napim.setvariable('RateLimitPerDay',\
+            \ RateLimitPerDay);\r\napim.setvariable('RateLimitPerSecond', RateLimitPerSecond);\r\
+            \napim.setvariable('RateLimitRemainingPerDay', RateLimitRemainingPerDay);\r\
+            \napim.setvariable('RateLimitRemainingPerSecond', RateLimitRemainingPerSecond);"
+  properties:
+    v1validatetoken:
+      value: /identity/v1/validate/token
+      description: /identity/v1/validate/token
+      encoded: false
+    Experian-URL:
+      value: https://www.ref.google.com
+      description: https://www.ref.google.com
+    CDO-URL:
+      value: https://www.chatgpt.com
+    dapi-appid:
+      value: efgh
+      description: efgh
+    dapi-clientsecret:
+      value: efgh
+      description: efgh
+    dapi-channelid:
+      value: WEB
+      description: WEB
+    content-type:
+      value: application/xml
+      description: application/xml
+  activity-log:
+    success-content: header
+    error-content: header
+    enabled: true
+  application-authentication:
+    certificate: false
+  catalogs: {}
+  categories:
+  - tmf-poc/middle-ware/CentralCreditCheck
+tags:
+- name: name
+  description: CentralCreditCheck_1_0
+paths:
+  /cvs:
+    post:
+      responses:
+        '200':
+          description: 200 OK
+          schema:
+            type: string
+      consumes: []
+      produces: []
+      description: The resource provides the capability to confirm the connection
+        for a given customer.
+      tags:
+      - /cvs
+      summary: The resource provides the capability to confirm the connection for
+        a given customer.
+      parameters: []
+    parameters:
+    - name: X-Client-Transaction-Id
+      in: header
+      required: true
+      description: Unique transaction id for originating system
+      type: string
+    - name: X-Requesting-User
+      in: header
+      required: true
+      description: Requesting user details
+      type: string
+    - name: Authorization
+      in: header
+      required: true
+      description: Validating Bearer Token
+      type: string
