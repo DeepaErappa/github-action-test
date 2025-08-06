@@ -24,7 +24,9 @@ def run(cmd, cwd=None):
     subprocess.run(cmd, shell=True, check=True, cwd=cwd)
 
 def create_zip():
-    with zipfile.ZipFile(ZIP_FILENAME, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    zip_path = os.path.join(DEST_REPO_DIR, ZIP_FILENAME)
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    
         # Step 1: Add all files from api-definitions
         for root, dirs, files in os.walk(API_DIR):
             for file in files:
