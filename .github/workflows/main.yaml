@@ -5,7 +5,7 @@ on:
     types: [closed]
 
 permissions:
-  contents: write   # optional but recommended if using GITHUB_TOKEN
+  contents: write   # required to push changes using GITHUB_TOKEN
 
 jobs:
   update-api-yaml:
@@ -34,6 +34,10 @@ jobs:
           echo "Target: ${{ github.event.pull_request.base.ref }}"
           python3 .github/main.py "${{ github.event.pull_request.head.ref }}" "${{ github.event.pull_request.base.ref }}"
 
+      - name: Remove .tmp-output folder
+        run: |
+          rm -rf .tmp-output
+
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
@@ -41,8 +45,8 @@ jobs:
 
       - name: Commit and Push changes
         run: |
-          git add .
-          git commit -m "Auto-updated api.yaml on merge" || echo "No changes to commit"
+          git add -A
+          git commit -m "Auto-updated api.yaml and cleaned up .tmp-output folder" || echo "No changes to commit"
           git push
 
       - name: Run zip_and_push.py to send zip to different repo
