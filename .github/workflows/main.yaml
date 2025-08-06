@@ -48,4 +48,4 @@ jobs:
       - name: Run zip_and_push.py to send zip to different repo
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: python3 .github/zip_and_push.py
+        run: python3 .github/zip-and-push.py
