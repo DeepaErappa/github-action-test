@@ -452,4 +452,3 @@ paths:
       required: true
       description: Validating Bearer Token
       type: string
-version: 1.0.01
