@@ -474,3 +474,4 @@ properties:
   content-type:
     value: application/xml
     description: application/xml
+version: 1.0.01
