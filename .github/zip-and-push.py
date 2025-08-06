@@ -80,8 +80,9 @@ def cleanup_tmp_folder():
         print(f"[✓] Removed {TMP_OUTPUT_DIR} folder")
 
 def main():
-    create_zip()
+    
     clone_dest_repo()
+    create_zip()
     copy_zip_to_repo()
     commit_and_push()
     cleanup_tmp_folder()
