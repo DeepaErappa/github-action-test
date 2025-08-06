@@ -25,6 +25,8 @@ def run(cmd, cwd=None):
 
 def create_zip():
     zip_path = os.path.join(DEST_REPO_DIR, ZIP_FILENAME)
+
+    
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
     
         # Step 1: Add all files from api-definitions
@@ -78,11 +80,11 @@ def cleanup_tmp_folder():
         print(f"[✓] Removed {TMP_OUTPUT_DIR} folder")
 
 def main():
-    create_zip()
+    
     clone_dest_repo()
+    create_zip()
     
     commit_and_push()
-    cleanup_tmp_folder()
     print("[✓] Zip pushed to target repo and cleaned up.")
 
 if __name__ == "__main__":

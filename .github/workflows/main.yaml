@@ -1,70 +1,3 @@
-name: Auto Update API YAML on Merge
-
-on:
-  pull_request:
-    types: [closed]
-
-permissions:
-  contents: write
-
-jobs:
-  update-api-yaml:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-    steps:
-      - name: Checkout target branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.ref }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Python dependencies
-        run: pip install pyyaml requests
-
-      - name: Run main.py with source and target branches
-        run: |
-          echo "Source: ${{ github.event.pull_request.head.ref }}"
-          echo "Target: ${{ github.event.pull_request.base.ref }}"
-          python3 .github/main.py "${{ github.event.pull_request.head.ref }}" "${{ github.event.pull_request.base.ref }}"
-
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit and Push YAML changes
-        run: |
-          git add .
-          git commit -m "Auto-updated api.yaml on merge" || echo "No YAML changes to commit"
-          git push
-
-      - name: Run zip_and_push.py to send zip to different repo
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: python3 .github/zip-and-push.py
-
-      - name: Delete .tmp-output folder
-        run: |
-          if [ -d ".tmp-output" ]; then
-            rm -rf .tmp-output
-            echo ".tmp-output deleted."
-          else
-            echo ".tmp-output does not exist, skipping."
-          fi
-
-      - name: Commit and Push cleanup
-        run: |
-          git add .
-          git commit -m "Cleanup .tmp-output after zip export" || echo "No cleanup changes to commit"
-          git push
-
 # name: Auto Update API YAML on Merge
 
 # on:
@@ -72,7 +5,7 @@ jobs:
 #     types: [closed]
 
 # permissions:
-#   contents: write   # optional but recommended if using GITHUB_TOKEN
+#   contents: write
 
 # jobs:
 #   update-api-yaml:
@@ -106,14 +39,90 @@ jobs:
 #           git config user.name "github-actions[bot]"
 #           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-#       - name: Commit and Push changes
+#       - name: Commit and Push YAML changes
 #         run: |
 #           git add .
-#           git commit -m "Auto-updated api.yaml on merge" || echo "No changes to commit"
+#           git commit -m "Auto-updated api.yaml on merge" || echo "No YAML changes to commit"
 #           git push
 
 #       - name: Run zip_and_push.py to send zip to different repo
 #         env:
 #           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 #         run: python3 .github/zip-and-push.py
+
+#       - name: Delete .tmp-output folder
+#         run: |
+#           if [ -d ".tmp-output" ]; then
+#             rm -rf .tmp-output
+#             echo ".tmp-output deleted."
+#           else
+#             echo ".tmp-output does not exist, skipping."
+#           fi
+
+#       - name: Commit and Push cleanup
+#         run: |
+#           git add .
+#           git commit -m "Cleanup .tmp-output after zip export" || echo "No cleanup changes to commit"
+#           git push
+
+name: Auto Update API YAML on Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write   # optional but recommended if using GITHUB_TOKEN
+
+jobs:
+  update-api-yaml:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: pip install pyyaml requests
+
+      - name: Run main.py with source and target branches
+        run: |
+          echo "Source: ${{ github.event.pull_request.head.ref }}"
+          echo "Target: ${{ github.event.pull_request.base.ref }}"
+          python3 .github/main.py "${{ github.event.pull_request.head.ref }}" "${{ github.event.pull_request.base.ref }}"
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and Push changes
+        run: |
+          git add .
+          git commit -m "Auto-updated api.yaml on merge" || echo "No changes to commit"
+          git push
+
+      - name: Run zip_and_push.py to send zip to different repo
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: python3 .github/zip-and-push.py
+      - name: Cleanup .tmp-output folder
+        run: |
+          if [ -d ".tmp-output" ]; then
+            echo "Deleting .tmp-output..."
+            rm -rf .tmp-output
+          else
+            echo ".tmp-output does not exist."
+          fi
+
       
