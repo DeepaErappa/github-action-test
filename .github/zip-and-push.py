@@ -83,7 +83,7 @@ def main():
     
     clone_dest_repo()
     create_zip()
-    copy_zip_to_repo()
+    
     commit_and_push()
     cleanup_tmp_folder()
     print("[✓] Zip pushed to target repo and cleaned up.")
