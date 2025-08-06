@@ -1,0 +1,16 @@
+organization|apic-poc
+catalog|dev
+ 
+pushAPI|existing|tmf-manage-credit-vetting_1.0.9.yaml|rest
+#pushProduct|existing|product-tmf-managecreditvetting.yaml
+publish|product-tmf-managecreditvetting.yaml|onpremgw
+ 
+ 
+subscribe|apimgw|ocs|product-tmf-managecreditvetting.yaml|default-plan
+subscribe|apic-poc-supercharge|ag-org|product-tmf-managecreditvetting.yaml|default-plan
+subscribe|apic-poc-energy|ag-org|product-tmf-managecreditvetting.yaml|default-plan
+subscribe|apic-poc-testsupport|ag-org|product-tmf-managecreditvetting.yaml|default-plan
+subscribe|apic-poc_esb|ag-org|product-tmf-managecreditvetting.yaml|default-plan
+subscribe|apic-poc-texttoswitch|imi|product-tmf-managecreditvetting.yaml|default-plan
+subscribe|middleware-test|bss-mango|product-tmf-managecreditvetting.yaml|default-plan
+subscribe|middlware-esb|esb|product-tmf-managecreditvetting.yaml|default-plan
