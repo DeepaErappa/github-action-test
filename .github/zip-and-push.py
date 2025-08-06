@@ -50,7 +50,6 @@ def commit_and_push():
     except subprocess.CalledProcessError:
         print("No changes to commit")
     run("git push", cwd=DEST_REPO_DIR)
-
 def main():
     create_zip()
     clone_dest_repo()
