@@ -452,26 +452,3 @@ paths:
       required: true
       description: Validating Bearer Token
       type: string
-properties:
-  v1validatetoken:
-    value: /identity/v1/validate/token
-    description: /identity/v1/validate/token
-    encoded: false
-  Experian-URL:
-    value: https://www.ref.google.com
-    description: https://www.ref.google.com
-  CDO-URL:
-    value: https://www.chatgpt.com
-  dapi-appid:
-    value: efgh
-    description: efgh
-  dapi-clientsecret:
-    value: efgh
-    description: efgh
-  dapi-channelid:
-    value: WEB
-    description: WEB
-  content-type:
-    value: application/xml
-    description: application/xml
-version: 1.0.01
