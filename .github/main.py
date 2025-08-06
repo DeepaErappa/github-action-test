@@ -63,56 +63,29 @@ def fetch_external_yaml_file(repo, path, branch):
     return yaml.safe_load(response.text)
 
 
-# def replace_properties(env_yaml_file):
-#     api_data = load_yaml(API_YAML)
-#     if env_yaml_file in ["staging.yaml", "prod.yaml"]:
-#         print(f"[i] Fetching {env_yaml_file} from external repository")
-#         env_data = fetch_external_yaml_file(EXTERNAL_REPO, f"deployment-config/{env_yaml_file}", EXTERNAL_BRANCH)
-#         print(env_data)
-#     else:
-#         env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
-
-
-#     if 'properties' not in env_data:
-#         raise KeyError(f"'properties' not found in {env_yaml_file}")
-#     # Update version if present
-#     if 'version' in env_data:
-#         api_data['version'] = env_data['version']
-#         print(f"[✓] Updated 'version' in {API_YAML} to {env_data['version']}")
-#     else:
-#         print(f"[i] 'version' not found in {env_yaml_file}, skipping version update.")
-
-
-#     api_data['properties'] = env_data['properties']
-#     write_yaml(API_YAML, api_data)
-#     print(f"[✓] Updated 'properties' in {API_YAML} using {env_yaml_file}")
-
 def replace_properties(env_yaml_file):
     api_data = load_yaml(API_YAML)
-    
-    # Load env config from either external or local
     if env_yaml_file in ["staging.yaml", "prod.yaml"]:
+        print(f"[i] Fetching {env_yaml_file} from external repository")
         env_data = fetch_external_yaml_file(EXTERNAL_REPO, f"deployment-config/{env_yaml_file}", EXTERNAL_BRANCH)
+        print(env_data)
     else:
         env_data = load_yaml(os.path.join(CONFIG_DIR, env_yaml_file))
 
+
     if 'properties' not in env_data:
         raise KeyError(f"'properties' not found in {env_yaml_file}")
+    # Update version if present
+    if 'version' in env_data:
+        api_data['version'] = env_data['version']
+        print(f"[✓] Updated 'version' in {API_YAML} to {env_data['version']}")
+    else:
+        print(f"[i] 'version' not found in {env_yaml_file}, skipping version update.")
 
-    # Update only 'properties'
-    old_properties = api_data.get('properties', {})
-    new_properties = env_data['properties']
 
-    print("Before update properties keys:", old_properties.keys())
-    print("New properties keys:", new_properties.keys())
-
-    api_data['properties'] = new_properties
-
+    api_data['properties'] = env_data['properties']
     write_yaml(API_YAML, api_data)
-    print(f"[✓] Updated 'properties' in {API_YAML} from {env_yaml_file}")
-
-
-
+    print(f"[✓] Updated 'properties' in {API_YAML} using {env_yaml_file}")
 
 # def main():
 #     current_branch = get_current_branch()
