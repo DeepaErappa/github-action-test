@@ -121,6 +121,13 @@ jobs:
           git rm -r --cached zip-target || true
           git rm -r --cached .tmp-output || true
 
+      - name: Commit and Push folder removal
+        run: |
+          git add .
+          git diff --cached --quiet || git commit -m "Remove generated folders from tracking"
+          git push
+
+
       # - name: Remove generated folders from Git index
       #   run: |
       #     git rm -r --cached zip-target || true
