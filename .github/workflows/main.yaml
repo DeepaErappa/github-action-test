@@ -125,6 +125,7 @@ jobs:
             git add .
             git commit -m "Remove .tmp-output folder after zipping" || echo "No changes to commit"
             git push
+          fi
 
       # - name: Delete and commit removal of .tmp-output
       #   run: |
