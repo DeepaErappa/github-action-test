@@ -390,23 +390,32 @@ x-ibm-configuration:
       value: /identity/v1/validate/token
       description: /identity/v1/validate/token
       encoded: false
-    Experian-URL:
-      value: https://www.ref.google.com
-      description: https://www.ref.google.com
+    CCC-URL:
+      value: https://ping.staging.central-credit-check.com/cvs
+      description: https://ping.staging.central-credit-check.com/cvs
     CDO-URL:
-      value: https://www.chatgpt.com
+      value: https://int.staging.api.tmf-poc-digital.co.uk/ccc/credit-check
     dapi-appid:
-      value: efgh
-      description: efgh
+      value: tmf-poc-thbs
+      description: tmf-poc-thbs
     dapi-clientsecret:
-      value: efgh
-      description: efgh
+      value: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
+      description: ujkuletfmfuwzeqwcnotthscxqevjjsnygslqpbhooeuhweecjulvbfeikyrxtab
     dapi-channelid:
       value: WEB
       description: WEB
     content-type:
       value: application/xml
       description: application/xml
+    activity-log:
+      success-content: header
+      error-content: header
+      enabled: true
+    application-authentication:
+      certificate: false
+    catalogs: {}
+    categories:
+    - tmf-poc/middle-ware/CentralCreditCheck
   activity-log:
     success-content: header
     error-content: header
