@@ -78,6 +78,10 @@ def cleanup_tmp_folder():
     if os.path.exists(TMP_OUTPUT_DIR):
         shutil.rmtree(TMP_OUTPUT_DIR)
         print(f"[✓] Removed {TMP_OUTPUT_DIR} folder")
+def cleanup_dest_repo_dir():
+    if os.path.exists(DEST_REPO_DIR):
+        shutil.rmtree(DEST_REPO_DIR)
+        print(f"[✓] Removed {DEST_REPO_DIR} folder")
 
 def main():
     
@@ -86,6 +90,7 @@ def main():
     
     commit_and_push()
     cleanup_tmp_folder()
+    cleanup_dest_repo_dir()
     print("[✓] Zip pushed to target repo and cleaned up.")
 
 if __name__ == "__main__":
