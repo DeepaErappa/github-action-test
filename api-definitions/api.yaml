@@ -55,9 +55,9 @@ properties:
     value: /identity/v1/validate/token
     description: /identity/v1/validate/token
     encoded: false
-  CCC-URL:
-    value: https://ping.staging.central-credit-check.com/cvs
-    description: https://ping.staging.central-credit-check.com/cvs
+  Experian-URL:
+    value: https://www.dev.google.com
+    description: https://www.dev.google.com
   CDO-URL:
     value: https://int.staging.api.tmf-poc-digital.co.uk/ccc/credit-check
   dapi-appid:
