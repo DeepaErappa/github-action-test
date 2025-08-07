@@ -1,4 +1,4 @@
-version: 1.0.01
+version: 1.0.1
 properties:
   v1validatetoken:
     value: /identity/v1/validate/token
