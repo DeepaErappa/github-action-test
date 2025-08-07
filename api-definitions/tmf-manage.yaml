@@ -418,17 +418,6 @@ x-ibm-configuration:
   - tmf-poc/middle-ware/CentralCreditCheck
 tags:
 - name: name
-  description: CentralCreditCheck_1_0  activity-log:
-    success-content: header
-    error-content: header
-    enabled: true
-  application-authentication:
-    certificate: false
-  catalogs: {}
-  categories:
-  - tmf-poc/middle-ware/CentralCreditCheck
-tags:
-- name: name
   description: CentralCreditCheck_1_0
 paths:
   /cvs:
