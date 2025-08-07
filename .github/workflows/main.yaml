@@ -116,6 +116,34 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: python3 .github/zip-and-push.py
+      - name: Remove generated folders from Git index
+        run: |
+          git rm -r --cached zip-target || true
+          git rm -r --cached .tmp-output || true
+
+      - name: Commit and Push folder removal
+        run: |
+          git add .
+          git diff --cached --quiet || git commit -m "Remove generated folders from tracking"
+          git push
+
+
+      # - name: Remove generated folders from Git index
+      #   run: |
+      #     git rm -r --cached zip-target || true
+      #     git rm -r --cached .tmp-output || true
+
+      # - name: Commit and Push deletion of .tmp-output
+      #   run: |
+      #     if [ -d ".tmp-output" ]; then
+      #       echo ".tmp-output still exists. Not committing."
+      #     else
+      #       git rm -r --cached .tmp-output || true
+      #       git add .
+      #       git commit -m "Remove .tmp-output folder after zipping" || echo "No changes to commit"
+      #       git push
+      #     fi
+
       # - name: Delete and commit removal of .tmp-output
       #   run: |
       #     if [ -d ".tmp-output" ]; then

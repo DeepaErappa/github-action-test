@@ -387,19 +387,19 @@ x-ibm-configuration:
             \napim.setvariable('RateLimitRemainingPerSecond', RateLimitRemainingPerSecond);"
   properties:
     v1validatetoken:
-      value: /identity/v1/validate/token
+      value: ${v1validatetoken}
       description: /identity/v1/validate/token
       encoded: false
     Experian-URL:
-      value: https://www.dev.google.com
+      value: ${Experian-URL:}
       description: https://www.dev.google.com
     CDO-URL:
-      value: https://www.chatgpt.com
+      value: ${CDO-URL}
     dapi-appid:
-      value: efgh
+      value: ${dapi-appid}
       description: efgh
     dapi-clientsecret:
-      value: efgh
+      value: ${dapi-clientsecret}
       description: efgh
     dapi-channelid:
       value: WEB
