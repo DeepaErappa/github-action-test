@@ -85,6 +85,7 @@ def main():
     create_zip()
     
     commit_and_push()
+    cleanup_tmp_folder()
     print("[✓] Zip pushed to target repo and cleaned up.")
 
 if __name__ == "__main__":
