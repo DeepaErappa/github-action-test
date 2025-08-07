@@ -116,13 +116,27 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: python3 .github/zip-and-push.py
-      - name: Cleanup .tmp-output folder
-        run: |
-          if [ -d ".tmp-output" ]; then
-            echo "Deleting .tmp-output..."
-            rm -rf .tmp-output
-          else
-            echo ".tmp-output does not exist."
-          fi
+      # - name: Delete and commit removal of .tmp-output
+      #   run: |
+      #     if [ -d ".tmp-output" ]; then
+      #       echo "Deleting .tmp-output..."
+      #       rm -rf .tmp-output
+      #       git rm -r --cached .tmp-output || true
+      #       git add .
+      #       git commit -m "Remove .tmp-output directory" || echo "Nothing to commit"
+      #       git push
+      #     else
+      #       echo ".tmp-output does not exist."
+      #     fi
+      # - name: Clean up zip-target (do not commit)
+      #   run: |
+      #       if [ -d "zip-target" ]; then
+      #         echo "Cleaning up zip-target..."
+      #         rm -rf zip-target
+      #       else
+      #         echo "zip-target does not exist."
+      #       fi
+
+
 
       
